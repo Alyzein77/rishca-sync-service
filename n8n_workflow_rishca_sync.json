@@ -73,26 +73,13 @@
     },
     {
       "parameters": {
-        "mode": "combine",
-        "mergeByFields": {},
-        "options": {},
-        "combineBy": "combineAll"
-      },
-      "id": "merge-data",
-      "name": "Merge All Data",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [720, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Build financial snapshot from Supabase data\nconst timeEntries = $input.all().filter(i => i.json.member_name);\nconst scenario = $('Webhook: Sync Trigger').first().json.body?.scenario || 'base';\n\n// Get FX rate\nconst fxItems = $input.all().filter(i => i.json.usd_egp);\nconst usdEgp = fxItems.length > 0 ? fxItems[0].json.usd_egp : 50.0;\nconst egpToUsd = 1.0 / usdEgp;\n\n// Aggregate by month\nconst monthly = {};\nfor (const entry of timeEntries) {\n  const key = `${entry.json.year}-${String(entry.json.month).padStart(2, '0')}`;\n  if (!monthly[key]) {\n    monthly[key] = { month: key, total_egp: 0, total_usd: 0, by_member: [] };\n  }\n  const amount = parseFloat(entry.json.amount || 0);\n  monthly[key].total_egp += amount;\n  monthly[key].total_usd += amount * egpToUsd;\n  monthly[key].by_member.push({\n    name: entry.json.member_name,\n    year: entry.json.year,\n    month: entry.json.month,\n    hours: parseFloat(entry.json.hours || 0),\n    amount: amount,\n    hourly_rate: parseFloat(entry.json.hourly_rate || 0),\n  });\n}\n\n// Build annual totals\nconst annual_egp = {};\nconst annual_usd = {};\nfor (const [key, data] of Object.entries(monthly)) {\n  const year = parseInt(key.split('-')[0]);\n  const fy = `fy${year - 2000}`;\n  annual_egp[fy] = (annual_egp[fy] || 0) + data.total_egp;\n  annual_usd[fy] = (annual_usd[fy] || 0) + data.total_usd;\n}\n\nconst snapshot = {\n  generated_at: new Date().toISOString(),\n  scenario: scenario,\n  currency: { egp_to_usd: egpToUsd },\n  team_costs: {\n    monthly_summary: Object.values(monthly),\n    annual_totals_egp: annual_egp,\n    annual_totals_usd: annual_usd,\n  },\n  assumptions: $('Webhook: Sync Trigger').first().json.body?.assumptions || {},\n  customer_growth: $('Webhook: Sync Trigger').first().json.body?.customer_growth || {},\n};\n\nreturn [{ json: snapshot }];"
+        "jsCode": "// Pull data from upstream nodes by name\nconst timeEntries = $('Supabase: Fetch Time Entries').all().map(i => i.json);\nconst teamMembers = $('Supabase: Fetch Team Members').all().map(i => i.json);\nconst fxRates = $('Supabase: Fetch FX Rate').all().map(i => i.json);\nconst scenario = $('Webhook: Sync Trigger').first().json.body?.scenario || 'base';\n\n// Get FX rate\nconst usdEgp = fxRates.length > 0 ? fxRates[0].usd_egp : 50.0;\nconst egpToUsd = 1.0 / usdEgp;\n\n// Aggregate by month\nconst monthly = {};\nfor (const entry of timeEntries) {\n  const key = `${entry.year}-${String(entry.month).padStart(2, '0')}`;\n  if (!monthly[key]) {\n    monthly[key] = { month: key, total_egp: 0, total_usd: 0, by_member: [] };\n  }\n  const amount = parseFloat(entry.amount || 0);\n  monthly[key].total_egp += amount;\n  monthly[key].total_usd += amount * egpToUsd;\n  monthly[key].by_member.push({\n    name: entry.member_name,\n    year: entry.year,\n    month: entry.month,\n    hours: parseFloat(entry.hours || 0),\n    amount: amount,\n    hourly_rate: parseFloat(entry.hourly_rate || 0),\n  });\n}\n\n// Build annual totals\nconst annual_egp = {};\nconst annual_usd = {};\nfor (const [key, data] of Object.entries(monthly)) {\n  const year = parseInt(key.split('-')[0]);\n  const fy = `fy${year - 2000}`;\n  annual_egp[fy] = (annual_egp[fy] || 0) + data.total_egp;\n  annual_usd[fy] = (annual_usd[fy] || 0) + data.total_usd;\n}\n\nconst snapshot = {\n  generated_at: new Date().toISOString(),\n  scenario: scenario,\n  currency: { egp_to_usd: egpToUsd },\n  team_costs: {\n    monthly_summary: Object.values(monthly),\n    annual_totals_egp: annual_egp,\n    annual_totals_usd: annual_usd,\n  },\n  team_members: teamMembers,\n  assumptions: $('Webhook: Sync Trigger').first().json.body?.assumptions || {},\n  customer_growth: $('Webhook: Sync Trigger').first().json.body?.customer_growth || {},\n};\n\nreturn [{ json: snapshot }];"
       },
       "id": "build-snapshot",
       "name": "Code: Build Snapshot",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300]
+      "position": [720, 300]
     },
     {
       "parameters": {
@@ -156,20 +143,15 @@
     },
     "Supabase: Fetch Time Entries": {
       "main": [
-        [{ "node": "Merge All Data", "type": "main", "index": 0 }]
+        [{ "node": "Code: Build Snapshot", "type": "main", "index": 0 }]
       ]
     },
     "Supabase: Fetch Team Members": {
       "main": [
-        [{ "node": "Merge All Data", "type": "main", "index": 1 }]
+        [{ "node": "Code: Build Snapshot", "type": "main", "index": 0 }]
       ]
     },
     "Supabase: Fetch FX Rate": {
-      "main": [
-        [{ "node": "Merge All Data", "type": "main", "index": 0 }]
-      ]
-    },
-    "Merge All Data": {
       "main": [
         [{ "node": "Code: Build Snapshot", "type": "main", "index": 0 }]
       ]
