@@ -17,12 +17,12 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "https://llrvrcgwhvcaqvscpnsi.supabase.co/rest/v1/time_entries?select=*",
+        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/time_entries?select=*",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscnZyY2d3aHZjYXF2c2NwbnNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDE4NDYsImV4cCI6MjA4NTU3Nzg0Nn0.01ezIxg5-RMBBUvcSY8e4G5lS8k71gSYLPSXATJo5fY" },
-            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscnZyY2d3aHZjYXF2c2NwbnNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDE4NDYsImV4cCI6MjA4NTU3Nzg0Nn0.01ezIxg5-RMBBUvcSY8e4G5lS8k71gSYLPSXATJo5fY" }
+            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
+            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
           ]
         },
         "options": {}
@@ -36,12 +36,12 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "https://llrvrcgwhvcaqvscpnsi.supabase.co/rest/v1/team_members?select=*",
+        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/team_members?select=*",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscnZyY2d3aHZjYXF2c2NwbnNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDE4NDYsImV4cCI6MjA4NTU3Nzg0Nn0.01ezIxg5-RMBBUvcSY8e4G5lS8k71gSYLPSXATJo5fY" },
-            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscnZyY2d3aHZjYXF2c2NwbnNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDE4NDYsImV4cCI6MjA4NTU3Nzg0Nn0.01ezIxg5-RMBBUvcSY8e4G5lS8k71gSYLPSXATJo5fY" }
+            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
+            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
           ]
         },
         "options": {}
@@ -55,12 +55,12 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "https://llrvrcgwhvcaqvscpnsi.supabase.co/rest/v1/fx_rates?order=rate_date.desc&limit=1",
+        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/fx_rates?order=rate_date.desc&limit=1",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscnZyY2d3aHZjYXF2c2NwbnNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDE4NDYsImV4cCI6MjA4NTU3Nzg0Nn0.01ezIxg5-RMBBUvcSY8e4G5lS8k71gSYLPSXATJo5fY" },
-            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscnZyY2d3aHZjYXF2c2NwbnNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDE4NDYsImV4cCI6MjA4NTU3Nzg0Nn0.01ezIxg5-RMBBUvcSY8e4G5lS8k71gSYLPSXATJo5fY" }
+            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
+            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
           ]
         },
         "options": {}
