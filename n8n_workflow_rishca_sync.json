@@ -1,5 +1,5 @@
 {
-  "name": "Rishca Financial Sync Pipeline",
+  "name": "Rishca Financial Sync Pipeline v2",
   "nodes": [
     {
       "parameters": {
@@ -21,8 +21,8 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
-            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
           ]
         },
         "options": {}
@@ -40,8 +40,8 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
-            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
           ]
         },
         "options": {}
@@ -55,12 +55,12 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/fx_rates?order=rate_date.desc&limit=1",
+        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/fx_rates?order=created_at.desc&limit=1",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
-            { "name": "Authorization", "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
           ]
         },
         "options": {}
@@ -97,7 +97,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://rishca-sync-service-production.up.railway.app/api/sync",
+        "url": "https://rishca-sync-service-production.up.railway.app/api/sync",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json) }}",
@@ -110,43 +110,6 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [1200, 300]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "=https://rishca-sync-service-production.up.railway.app{{ $json.download_urls?.slides || $json.download_urls?.model }}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
-      },
-      "id": "download-files",
-      "name": "HTTP: Download Generated Files",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1440, 200]
-    },
-    {
-      "parameters": {
-        "operation": "upload",
-        "name": "=Rishca_OS_Financial_Pitch_Slides_{{ $now.format('yyyyMMdd') }}.pptx",
-        "folderId": "1OQ_sebrvhbrbZQMVMDpCUTTKIKCbu7nJ",
-        "options": {}
-      },
-      "id": "upload-to-drive",
-      "name": "Google Drive: Upload Slides",
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [1680, 200],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "REPLACE_WITH_YOUR_GDRIVE_CREDENTIAL_ID",
-          "name": "Google Drive"
-        }
-      }
     },
     {
       "parameters": {
@@ -166,7 +129,7 @@
       "name": "Set: Response",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [1680, 400]
+      "position": [1440, 300]
     },
     {
       "parameters": {
@@ -178,7 +141,7 @@
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1920, 300]
+      "position": [1680, 300]
     }
   ],
   "connections": {
@@ -219,19 +182,8 @@
     "HTTP: Call Sync Service": {
       "main": [
         [
-          { "node": "HTTP: Download Generated Files", "type": "main", "index": 0 },
           { "node": "Set: Response", "type": "main", "index": 0 }
         ]
-      ]
-    },
-    "HTTP: Download Generated Files": {
-      "main": [
-        [{ "node": "Google Drive: Upload Slides", "type": "main", "index": 0 }]
-      ]
-    },
-    "Google Drive: Upload Slides": {
-      "main": [
-        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
       ]
     },
     "Set: Response": {
