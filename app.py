@@ -413,6 +413,55 @@ async def sync_from_db(scenario: str = "base"):
 
 
 # ============================================================================
+# ONE-CLICK SYNC VIA VITALIS API (no N8N needed)
+# ============================================================================
+
+VITALIS_API_URL = os.getenv(
+    "VITALIS_API_URL",
+    "https://llrvrcgwhvcaqvscpnsi.supabase.co/functions/v1/team-time-log"
+)
+VITALIS_API_KEY = os.getenv("VITALIS_API_KEY", "TiQwbG47NLUKYhg")
+
+
+@app.post("/api/sync-now")
+async def sync_now(scenario: str = "base", days: int = 365):
+    """
+    One-click sync: fetches time data from Vitalis Edge Function,
+    transforms it, and runs the full Budget → Model → Slides pipeline.
+    This is the endpoint the Lovable dashboard 'Sync Now' button should call.
+    """
+    # Step 1: Fetch from Vitalis API
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        try:
+            r = await client.get(
+                f"{VITALIS_API_URL}?days={days}",
+                headers={"x-api-key": VITALIS_API_KEY},
+            )
+            r.raise_for_status()
+            vitalis_data = r.json()
+        except Exception as e:
+            raise HTTPException(502, f"Failed to fetch from Vitalis API: {e}")
+
+    # Step 2: Build payload in the format transform_vitalis_to_snapshot expects
+    payload = {
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "scenario": scenario,
+        "source": "sync-now",
+        "vitalis_data": vitalis_data,
+    }
+
+    # Step 3: Transform and run full sync pipeline
+    snapshot = transform_vitalis_to_snapshot(payload)
+    return await sync_all(snapshot)
+
+
+@app.get("/api/sync-now")
+async def sync_now_get(scenario: str = "base", days: int = 365):
+    """GET version of sync-now for easy browser/button triggers."""
+    return await sync_now(scenario=scenario, days=days)
+
+
+# ============================================================================
 # FILE DOWNLOAD
 # ============================================================================
 
