@@ -1,10 +1,11 @@
 {
-  "name": "Rishca Financial Sync Pipeline v2",
+  "name": "Rishca Financial Sync Pipeline v3",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "rishca-sync",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "webhook-trigger",
@@ -12,7 +13,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [220, 300],
-      "webhookId": "rishca-sync"
+      "webhookId": "rishca-sync-v3"
     },
     {
       "parameters": {
@@ -58,18 +59,6 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [960, 300]
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ status: 'success', ...($json) }) }}",
-        "options": {}
-      },
-      "id": "respond-webhook",
-      "name": "Respond to Webhook",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [1200, 300]
     }
   ],
   "connections": {
@@ -88,11 +77,6 @@
     "Code: Build Snapshot": {
       "main": [
         [{ "node": "HTTP: Call Sync Service", "type": "main", "index": 0 }]
-      ]
-    },
-    "HTTP: Call Sync Service": {
-      "main": [
-        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
       ]
     }
   },
