@@ -21,7 +21,7 @@ from sync_budget import update_budget_xlsx
 from sync_model import update_financial_model
 from sync_slides import update_pitch_slides
 
-app = FastAPI(title="Rishca Sync Service", version="1.0.0")
+app = FastAPI(title="Rishca Sync Service", version="1.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +40,136 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://llrvrcgwhvcaqvscpnsi.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
 SYNC_API_KEY = os.getenv("SYNC_API_KEY", "rishca-sync-2026")
+
+# Default hourly rates (EGP) per team member — used when Vitalis only has hours
+DEFAULT_HOURLY_RATES = {
+    "Rana El Sobky": 250, "Abaza": 200, "Alaa Ashraf": 200,
+    "Nada Amin": 200, "Ahmed Hamdy": 200, "Yasseen Nouh": 200,
+    "Amr Tarek": 200, "Tarek Mohamed": 200, "Amal Hamdy": 150,
+    "Aml Hamdy": 150, "Anas Emad": 150, "Bahaa Mohamed": 150,
+    "Bahaa Lashin": 150, "Aly Zein Eldin": 0,  # founder — no hourly cost
+}
+DEFAULT_EGP_TO_USD = 0.020  # 1 EGP ≈ 0.02 USD (50 EGP/USD)
+
+
+# ============================================================================
+# VITALIS DATA TRANSFORMER
+# ============================================================================
+
+def transform_vitalis_to_snapshot(payload: dict) -> dict:
+    """
+    Transform raw Vitalis API response (from N8N) into the snapshot format
+    expected by sync_budget.py and sync_model.py.
+
+    Vitalis entries have: logged_at, duration_minutes, user.name, task, workspace_name
+    Snapshot expects: team_costs.monthly_summary[].by_member[].{name, year, month, hours, amount, hourly_rate}
+    """
+    vitalis_data = payload.get("vitalis_data", {})
+    entries = vitalis_data.get("entries", [])
+
+    # If vitalis_data is a list (the entries themselves), handle that too
+    if isinstance(vitalis_data, list):
+        entries = vitalis_data
+        vitalis_data = {}
+
+    egp_to_usd = DEFAULT_EGP_TO_USD
+
+    # Group entries by year-month and member
+    monthly_buckets = {}  # key: "YYYY-MM" -> {member_name: {minutes, entries_count}}
+
+    for entry in entries:
+        logged_at = entry.get("logged_at", "")
+        if not logged_at:
+            continue
+
+        # Parse date: "2026-03-21T00:00:00+00:00"
+        date_part = logged_at[:10]  # "2026-03-21"
+        parts = date_part.split("-")
+        if len(parts) < 3:
+            continue
+        year, month = int(parts[0]), int(parts[1])
+        month_key = f"{year}-{month:02d}"
+
+        # Get member name
+        user_info = entry.get("user", {})
+        if isinstance(user_info, str):
+            member_name = user_info
+        else:
+            member_name = user_info.get("name", "Unknown")
+
+        duration_minutes = float(entry.get("duration_minutes", 0))
+
+        if month_key not in monthly_buckets:
+            monthly_buckets[month_key] = {}
+        if member_name not in monthly_buckets[month_key]:
+            monthly_buckets[month_key][member_name] = 0.0
+        monthly_buckets[month_key][member_name] += duration_minutes
+
+    # Build monthly_summary in the format sync_budget expects
+    monthly_summary = []
+    annual_totals_egp = {}
+
+    for month_key in sorted(monthly_buckets.keys()):
+        parts = month_key.split("-")
+        year, month = int(parts[0]), int(parts[1])
+        total_egp = 0.0
+        by_member = []
+
+        for member_name, total_minutes in monthly_buckets[month_key].items():
+            hours = total_minutes / 60.0
+            hourly_rate = DEFAULT_HOURLY_RATES.get(member_name, 175)
+            amount = hours * hourly_rate
+
+            by_member.append({
+                "name": member_name,
+                "year": year,
+                "month": month,
+                "hours": round(hours, 2),
+                "hourly_rate": hourly_rate,
+                "amount": round(amount, 2),
+                "employment_type": "Hourly",
+            })
+            total_egp += amount
+
+        total_usd = total_egp * egp_to_usd
+
+        monthly_summary.append({
+            "month": month_key,
+            "total_egp": round(total_egp, 2),
+            "total_usd": round(total_usd, 2),
+            "by_member": by_member,
+        })
+
+        # Accumulate annual totals
+        fy = f"fy{year - 2000}"
+        annual_totals_egp[fy] = annual_totals_egp.get(fy, 0) + total_egp
+
+    # Build the full snapshot
+    snapshot = {
+        "generated_at": payload.get("generated_at", datetime.utcnow().isoformat() + "Z"),
+        "scenario": payload.get("scenario", "base"),
+        "currency": {"egp_to_usd": egp_to_usd},
+        "team_costs": {
+            "monthly_summary": monthly_summary,
+            "annual_totals_egp": annual_totals_egp,
+            "annual_totals_usd": {k: v * egp_to_usd for k, v in annual_totals_egp.items()},
+        },
+        "vitalis_summary": {
+            "total_entries": len(entries),
+            "total_hours": vitalis_data.get("total_hours", 0),
+            "team_count": len(vitalis_data.get("team_summary", [])),
+        },
+    }
+
+    # Pass through optional fields from webhook body
+    if payload.get("assumptions"):
+        snapshot["assumptions"] = payload["assumptions"]
+    if payload.get("customer_growth"):
+        snapshot["customer_growth"] = payload["customer_growth"]
+    if payload.get("tool_costs"):
+        snapshot["tool_costs"] = payload["tool_costs"]
+
+    return snapshot
 
 
 # ============================================================================
@@ -104,7 +234,9 @@ class FinancialSnapshot(BaseModel):
 async def health():
     return {
         "service": "rishca-sync",
+        "version": "1.1.0",
         "status": "healthy",
+        "vitalis_transform": True,
         "templates_loaded": {
             "budget": (TEMPLATES_DIR / "Team_Budget_Clean.xlsx").exists(),
             "model": (TEMPLATES_DIR / "Rishca_OS_Financial_Model.xlsx").exists(),
@@ -217,9 +349,14 @@ async def fetch_snapshot(scenario: str = "base"):
 async def sync_all(snapshot: dict):
     """
     Receives a financial snapshot JSON (from N8N or direct call).
+    If the payload contains 'vitalis_data', transforms it first.
     Updates Budget XLSX → Financial Model XLSX → Pitch Slides PPTX.
     Returns paths to generated files.
     """
+    # Auto-detect and transform Vitalis API format
+    if "vitalis_data" in snapshot:
+        snapshot = transform_vitalis_to_snapshot(snapshot)
+
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     results = {"timestamp": timestamp, "files": {}}
 
