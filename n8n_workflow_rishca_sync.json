@@ -17,63 +17,24 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/time_entries?select=*",
+        "url": "https://llrvrcgwhvcaqvscpnsi.supabase.co/functions/v1/team-time-log?days=365",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
-            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
+            { "name": "x-api-key", "value": "TiQwbG47NLUKYhg" }
           ]
         },
         "options": {}
       },
-      "id": "fetch-time-entries",
-      "name": "Supabase: Fetch Time Entries",
+      "id": "fetch-vitalis-data",
+      "name": "Vitalis: Fetch Team Time Log",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [460, 200]
+      "position": [460, 300]
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/team_members?select=*",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
-            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
-          ]
-        },
-        "options": {}
-      },
-      "id": "fetch-team-members",
-      "name": "Supabase: Fetch Team Members",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [460, 400]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "https://rjjjckoktnesjnhewqnr.supabase.co/rest/v1/fx_rates?order=created_at.desc&limit=1",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" },
-            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqampja29rdG5lc2puaGV3cW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTkyNzQsImV4cCI6MjA4OTUzNTI3NH0.ZfTusGV9s6DmXqwg1nA4aDhti9aPkiwIZsK0fUgXxlQ" }
-          ]
-        },
-        "options": {}
-      },
-      "id": "fetch-fx-rate",
-      "name": "Supabase: Fetch FX Rate",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [460, 600]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Pull data from upstream nodes by name\nconst timeEntries = $('Supabase: Fetch Time Entries').all().map(i => i.json);\nconst teamMembers = $('Supabase: Fetch Team Members').all().map(i => i.json);\nconst fxRates = $('Supabase: Fetch FX Rate').all().map(i => i.json);\nconst scenario = $('Webhook: Sync Trigger').first().json.body?.scenario || 'base';\n\n// Get FX rate\nconst usdEgp = fxRates.length > 0 ? fxRates[0].usd_egp : 50.0;\nconst egpToUsd = 1.0 / usdEgp;\n\n// Aggregate by month\nconst monthly = {};\nfor (const entry of timeEntries) {\n  const key = `${entry.year}-${String(entry.month).padStart(2, '0')}`;\n  if (!monthly[key]) {\n    monthly[key] = { month: key, total_egp: 0, total_usd: 0, by_member: [] };\n  }\n  const amount = parseFloat(entry.amount || 0);\n  monthly[key].total_egp += amount;\n  monthly[key].total_usd += amount * egpToUsd;\n  monthly[key].by_member.push({\n    name: entry.member_name,\n    year: entry.year,\n    month: entry.month,\n    hours: parseFloat(entry.hours || 0),\n    amount: amount,\n    hourly_rate: parseFloat(entry.hourly_rate || 0),\n  });\n}\n\n// Build annual totals\nconst annual_egp = {};\nconst annual_usd = {};\nfor (const [key, data] of Object.entries(monthly)) {\n  const year = parseInt(key.split('-')[0]);\n  const fy = `fy${year - 2000}`;\n  annual_egp[fy] = (annual_egp[fy] || 0) + data.total_egp;\n  annual_usd[fy] = (annual_usd[fy] || 0) + data.total_usd;\n}\n\nconst snapshot = {\n  generated_at: new Date().toISOString(),\n  scenario: scenario,\n  currency: { egp_to_usd: egpToUsd },\n  team_costs: {\n    monthly_summary: Object.values(monthly),\n    annual_totals_egp: annual_egp,\n    annual_totals_usd: annual_usd,\n  },\n  team_members: teamMembers,\n  assumptions: $('Webhook: Sync Trigger').first().json.body?.assumptions || {},\n  customer_growth: $('Webhook: Sync Trigger').first().json.body?.customer_growth || {},\n};\n\nreturn [{ json: snapshot }];"
+        "jsCode": "// Build financial snapshot from Vitalis API response\nconst vitalisData = $('Vitalis: Fetch Team Time Log').first().json;\nconst scenario = $('Webhook: Sync Trigger').first().json.body?.scenario || 'base';\nconst entries = vitalisData.entries || [];\nconst teamSummary = vitalisData.team_summary || [];\n\n// Default FX rate (EGP per USD)\nconst usdEgp = 50.0;\nconst egpToUsd = 1.0 / usdEgp;\n\n// Aggregate entries by month\nconst monthly = {};\nfor (const entry of entries) {\n  // Parse date to get year-month\n  const date = new Date(entry.date);\n  const year = date.getFullYear();\n  const month = date.getMonth() + 1;\n  const key = `${year}-${String(month).padStart(2, '0')}`;\n  \n  if (!monthly[key]) {\n    monthly[key] = { month: key, total_hours: 0, by_member: [] };\n  }\n  const hours = parseFloat(entry.minutes || 0) / 60;\n  monthly[key].total_hours += hours;\n  monthly[key].by_member.push({\n    name: entry.member_name || entry.name,\n    hours: hours,\n    date: entry.date,\n    task: entry.task || entry.description || ''\n  });\n}\n\n// Build team members list from summary\nconst team_members = teamSummary.map(m => ({\n  name: m.name,\n  email: m.email,\n  total_hours: m.total_hours,\n  total_minutes: m.total_minutes\n}));\n\nconst snapshot = {\n  generated_at: new Date().toISOString(),\n  scenario: scenario,\n  currency: { egp_to_usd: egpToUsd, usd_egp: usdEgp },\n  vitalis_period: vitalisData.period,\n  total_entries: vitalisData.count,\n  total_hours: vitalisData.total_hours,\n  team_costs: {\n    monthly_summary: Object.values(monthly),\n    team_members: team_members\n  },\n  assumptions: $('Webhook: Sync Trigger').first().json.body?.assumptions || {},\n  customer_growth: $('Webhook: Sync Trigger').first().json.body?.customer_growth || {},\n};\n\nreturn [{ json: snapshot }];"
       },
       "id": "build-snapshot",
       "name": "Code: Build Snapshot",
@@ -96,62 +57,30 @@
       "name": "HTTP: Call Sync Service",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 300]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "status",
-              "name": "status",
-              "value": "=Pipeline completed. Files: {{ Object.keys($('HTTP: Call Sync Service').first().json.download_urls || {}).join(', ') }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "set-response",
-      "name": "Set: Response",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [1440, 300]
+      "position": [960, 300]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ status: 'success', ...($('HTTP: Call Sync Service').first().json) }) }}",
+        "responseBody": "={{ JSON.stringify({ status: 'success', ...($json) }) }}",
         "options": {}
       },
       "id": "respond-webhook",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1680, 300]
+      "position": [1200, 300]
     }
   ],
   "connections": {
     "Webhook: Sync Trigger": {
       "main": [
         [
-          { "node": "Supabase: Fetch Time Entries", "type": "main", "index": 0 },
-          { "node": "Supabase: Fetch Team Members", "type": "main", "index": 0 },
-          { "node": "Supabase: Fetch FX Rate", "type": "main", "index": 0 }
+          { "node": "Vitalis: Fetch Team Time Log", "type": "main", "index": 0 }
         ]
       ]
     },
-    "Supabase: Fetch Time Entries": {
-      "main": [
-        [{ "node": "Code: Build Snapshot", "type": "main", "index": 0 }]
-      ]
-    },
-    "Supabase: Fetch Team Members": {
-      "main": [
-        [{ "node": "Code: Build Snapshot", "type": "main", "index": 0 }]
-      ]
-    },
-    "Supabase: Fetch FX Rate": {
+    "Vitalis: Fetch Team Time Log": {
       "main": [
         [{ "node": "Code: Build Snapshot", "type": "main", "index": 0 }]
       ]
@@ -162,13 +91,6 @@
       ]
     },
     "HTTP: Call Sync Service": {
-      "main": [
-        [
-          { "node": "Set: Response", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "Set: Response": {
       "main": [
         [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
       ]
