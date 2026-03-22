@@ -16,12 +16,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import httpx
+import base64
+import logging
 
 from sync_budget import update_budget_xlsx
 from sync_model import update_financial_model
 from sync_slides import update_pitch_slides
 
-app = FastAPI(title="Rishca Sync Service", version="1.1.0")
+logger = logging.getLogger("rishca-sync")
+
+app = FastAPI(title="Rishca Sync Service", version="1.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -50,6 +54,96 @@ DEFAULT_HOURLY_RATES = {
     "Bahaa Lashin": 150, "Aly Zein Eldin": 0,  # founder — no hourly cost
 }
 DEFAULT_EGP_TO_USD = 0.020  # 1 EGP ≈ 0.02 USD (50 EGP/USD)
+
+# Google Drive config
+GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID", "1OQ_sebrvhbrbZQMVMDpCUTTKIKCbu7nJ")
+GDRIVE_SERVICE_ACCOUNT_JSON = os.getenv("GDRIVE_SERVICE_ACCOUNT_JSON", "")
+
+
+# ============================================================================
+# GOOGLE DRIVE UPLOAD HELPER
+# ============================================================================
+
+def _get_gdrive_service():
+    """Build Google Drive API service from service account credentials."""
+    if not GDRIVE_SERVICE_ACCOUNT_JSON:
+        return None
+    try:
+        from google.oauth2 import service_account
+        from googleapiclient.discovery import build
+
+        # Credentials can be base64-encoded JSON or raw JSON
+        try:
+            cred_json = json.loads(base64.b64decode(GDRIVE_SERVICE_ACCOUNT_JSON))
+        except Exception:
+            cred_json = json.loads(GDRIVE_SERVICE_ACCOUNT_JSON)
+
+        credentials = service_account.Credentials.from_service_account_info(
+            cred_json,
+            scopes=["https://www.googleapis.com/auth/drive.file"],
+        )
+        return build("drive", "v3", credentials=credentials)
+    except Exception as e:
+        logger.warning(f"Google Drive init failed: {e}")
+        return None
+
+
+def upload_to_gdrive(file_path: str, folder_id: str = None) -> dict:
+    """Upload a file to Google Drive. Returns file metadata or error."""
+    service = _get_gdrive_service()
+    if not service:
+        return {"error": "Google Drive not configured (set GDRIVE_SERVICE_ACCOUNT_JSON)"}
+
+    from googleapiclient.http import MediaFileUpload
+
+    folder = folder_id or GDRIVE_FOLDER_ID
+    filename = Path(file_path).name
+
+    # Check if file already exists in folder (update instead of duplicate)
+    # Search by name prefix (without timestamp) to find previous versions
+    base_name = filename.split("_202")[0]  # e.g. "Team_Budget_Clean"
+    query = f"'{folder}' in parents and name contains '{base_name}' and trashed=false"
+
+    try:
+        existing = service.files().list(q=query, fields="files(id,name)").execute()
+        existing_files = existing.get("files", [])
+    except Exception:
+        existing_files = []
+
+    # Determine MIME type
+    if filename.endswith(".xlsx"):
+        mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    elif filename.endswith(".pptx"):
+        mime = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    else:
+        mime = "application/octet-stream"
+
+    media = MediaFileUpload(file_path, mimetype=mime, resumable=True)
+
+    try:
+        if existing_files:
+            # Update the most recent existing file
+            file_id = existing_files[0]["id"]
+            updated = service.files().update(
+                fileId=file_id,
+                media_body=media,
+                body={"name": filename},
+                fields="id,name,webViewLink",
+            ).execute()
+            return {"id": updated["id"], "name": updated["name"],
+                    "url": updated.get("webViewLink", ""), "action": "updated"}
+        else:
+            # Create new file
+            file_metadata = {"name": filename, "parents": [folder]}
+            created = service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields="id,name,webViewLink",
+            ).execute()
+            return {"id": created["id"], "name": created["name"],
+                    "url": created.get("webViewLink", ""), "action": "created"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # ============================================================================
@@ -234,9 +328,10 @@ class FinancialSnapshot(BaseModel):
 async def health():
     return {
         "service": "rishca-sync",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "status": "healthy",
         "vitalis_transform": True,
+        "gdrive_configured": bool(GDRIVE_SERVICE_ACCOUNT_JSON),
         "templates_loaded": {
             "budget": (TEMPLATES_DIR / "Team_Budget_Clean.xlsx").exists(),
             "model": (TEMPLATES_DIR / "Rishca_OS_Financial_Model.xlsx").exists(),
@@ -400,6 +495,17 @@ async def sync_all(snapshot: dict):
         if not key.endswith("_error"):
             filename = Path(path).name
             results["download_urls"][key] = f"/download/{filename}"
+
+    # Auto-upload to Google Drive if configured
+    if GDRIVE_SERVICE_ACCOUNT_JSON:
+        results["gdrive"] = {}
+        for key, path in results["files"].items():
+            if not key.endswith("_error") and Path(path).exists():
+                try:
+                    gdrive_result = upload_to_gdrive(path)
+                    results["gdrive"][key] = gdrive_result
+                except Exception as e:
+                    results["gdrive"][f"{key}_error"] = str(e)
 
     return results
 
