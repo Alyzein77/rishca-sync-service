@@ -381,8 +381,11 @@ async def sync_all(snapshot: dict):
             results["files"]["model_error"] = str(e)
 
     # Step 3: Update Pitch Slides
+    # IMPORTANT: Use the TEMPLATE model (not output) because openpyxl
+    # wipes cached formula results on save. The template has correct
+    # values from when it was last saved in Excel.
     slides_template = TEMPLATES_DIR / "Rishca_OS_Financial_Pitch_Slides.pptx"
-    model_for_slides = results["files"].get("model", str(model_template))
+    model_for_slides = str(model_template)
     if slides_template.exists() and Path(model_for_slides).exists():
         slides_output = OUTPUT_DIR / f"Rishca_OS_Financial_Pitch_Slides_{timestamp}.pptx"
         try:
